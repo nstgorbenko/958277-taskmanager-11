@@ -1,3 +1,5 @@
+'use strict';
+
 const TASKS_NUMBER = 3;
 
 const createMenuTemplate = () => {
@@ -366,19 +368,19 @@ const createLoadMoreButton = () => {
   );
 };
 
-const render = (container, template, place = 'beforeend') => {
+const render = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
-}
+};
 
-const siteMainElement = document.querySelector('.main');
-const siteMenuElement = siteMainElement.querySelector('.main__control');
+const siteMainElement = document.querySelector(`.main`);
+const siteMenuElement = siteMainElement.querySelector(`.main__control`);
 
 render(siteMenuElement, createMenuTemplate());
 render(siteMainElement, createFiltersTemplate());
 render(siteMainElement, createBoardTemplate());
 
-const siteBoardElement = siteMainElement.querySelector('.board');
-const siteTaskListElement = siteBoardElement.querySelector('.board__tasks');
+const siteBoardElement = siteMainElement.querySelector(`.board`);
+const siteTaskListElement = siteBoardElement.querySelector(`.board__tasks`);
 render(siteTaskListElement, createCardFormTemplate());
 
 for (let i = 0; i < TASKS_NUMBER; i++) {
