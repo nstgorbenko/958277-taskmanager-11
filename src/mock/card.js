@@ -16,9 +16,7 @@ const DefaultRepeatingDays = {
   "su": false,
 };
 
-const getRandomIntegerNumber = (min, max) => {
-  return min + Math.floor(Math.random() * (max - min));
-};
+const getRandomIntegerNumber = (min, max) => min + Math.floor(Math.random() * (max - min));
 
 const getRandomArrayItem = (array) => {
   const randomIndex = getRandomIntegerNumber(0, array.length);
