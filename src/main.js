@@ -5,6 +5,7 @@ import CardsComponent from "./components/cards.js";
 import FilterComponent from "./components/filter.js";
 import LoadMoreButtonComponent from "./components/load-more-button.js";
 import MenuComponent from "./components/menu.js";
+import NoCardsComponent from "./components/no-cards.js";
 import SortComponent from "./components/sort.js";
 import {generateCards} from "./mock/card.js";
 import {generateFilters} from "./mock/filter.js";
@@ -15,27 +16,46 @@ const SHOWING_CARDS_COUNT_ON_START = 8;
 const SHOWING_CARDS_COUNT_BY_BUTTON = 8;
 
 const renderCard = (cardListElement, card) => {
-  const onEditButtonClick = () => {
+  const replaceTaskToEdit = () => {
     cardListElement.replaceChild(cardEditComponent.getElement(), cardComponent.getElement());
   };
 
-  const onEditFormSubmit = (evt) => {
-    evt.preventDefault();
+  const replaceEditToTask = () => {
     cardListElement.replaceChild(cardComponent.getElement(), cardEditComponent.getElement());
+  };
+
+  const onEscKeyDown = (evt) => {
+    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+    if (isEscKey) {
+      replaceEditToTask();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
   };
 
   const cardComponent = new CardComponent(card);
   const editButton = cardComponent.getElement().querySelector(`.card__btn--edit`);
-  editButton.addEventListener(`click`, onEditButtonClick);
+  editButton.addEventListener(`click`, () => {
+    replaceTaskToEdit();
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
 
   const cardEditComponent = new CardEditComponent(card);
   const editForm = cardEditComponent.getElement().querySelector(`form`);
-  editForm.addEventListener(`submit`, onEditFormSubmit);
+  editForm.addEventListener(`submit`, () => {
+    replaceEditToTask();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
 
   render(cardListElement, cardComponent.getElement());
 };
 
 const renderBoard = (boardComponent, cards) => {
+  if (!cards.length) {
+    render(boardComponent.getElement(), new NoCardsComponent().getElement());
+    return;
+  }
+
   render(boardComponent.getElement(), new SortComponent().getElement());
   render(boardComponent.getElement(), new CardsComponent().getElement());
 
