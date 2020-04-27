@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import AbstractComponent from "./abstract-component.js";
 
 const createCardsTemplate = () => {
   return (
@@ -6,23 +6,8 @@ const createCardsTemplate = () => {
   );
 };
 
-export default class Cards {
-  constructor() {
-    this._element = null;
-  }
-
+export default class Cards extends AbstractComponent {
   getTemplate() {
     return createCardsTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
