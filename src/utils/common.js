@@ -1,11 +1,11 @@
 const addZero = (number) => String(number).padStart(2, `0`);
 
-const EscapeKey = {
+const KeyboardKey = {
   ESCAPE: `Escape`,
   ESC: `Esc`
 };
 
-const isEscEvent = (evt) => evt.key === EscapeKey.ESCAPE || evt.key === EscapeKey.ESC;
+const isEscEvent = ({key}) => key === KeyboardKey.ESCAPE || key === KeyboardKey.ESC;
 
 const formatTime = (date) => {
   const hours = date.getHours();
