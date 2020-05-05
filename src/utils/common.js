@@ -1,17 +1,12 @@
-const addZero = (number) => String(number).padStart(2, `0`);
+import moment from "moment";
 
 const KeyboardKey = {
   ESCAPE: `Escape`,
   ESC: `Esc`
 };
 
-const isEscEvent = ({key}) => key === KeyboardKey.ESCAPE || key === KeyboardKey.ESC;
+export const isEscEvent = ({key}) => key === KeyboardKey.ESCAPE || key === KeyboardKey.ESC;
 
-const formatTime = (date) => {
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
+export const formatDate = (date) => moment(date).format(`D MMMM`);
 
-  return `${addZero(hours)}:${addZero(minutes)}`;
-};
-
-export {isEscEvent, formatTime};
+export const formatTime = (date) => moment(date).format(`HH:mm`);

@@ -1,6 +1,8 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {COLORS, DAYS, MONTH_NAMES} from "../const.js";
-import {formatTime} from "../utils/common.js";
+import {COLORS, DAYS} from "../const.js";
+import {formatDate, formatTime} from "../utils/common.js";
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
 
 const isRepeating = (repeatingDays) => Object.values(repeatingDays).some(Boolean);
 
@@ -48,7 +50,7 @@ const createCardEditTemplate = (card, options = {}) => {
   const {description, dueDate} = card;
   const {color, isDateShowing, isRepeatingCard, activeRepeatingDays} = options;
 
-  const date = (isDateShowing && dueDate) ? `${dueDate.getDate()} ${MONTH_NAMES[dueDate.getMonth()]}` : ``;
+  const date = (isDateShowing && dueDate) ? formatDate(dueDate) : ``;
   const time = (isDateShowing && dueDate) ? formatTime(dueDate) : ``;
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
@@ -139,10 +141,15 @@ export default class CardEdit extends AbstractSmartComponent {
 
     this._card = card;
     this._color = card.color;
+
     this._isDateShowing = !!card.dueDate;
     this._isRepeatingCard = Object.values(card.repeatingDays).some(Boolean);
     this._activeRepeatingDays = Object.assign({}, card.repeatingDays);
+
+    this._flatpickr = null;
     this._submitHandler = null;
+
+    this._applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -168,16 +175,37 @@ export default class CardEdit extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+    this._applyFlatpickr();
   }
 
   reset() {
     const card = this._card;
+    this._color = card.color;
 
     this._isDateShowing = !!card.dueDate;
     this._isRepeatingCard = Object.values(card.repeatingDays).some(Boolean);
     this._activeRepeatingDays = Object.assign({}, card.repeatingDays);
 
     this.rerender();
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickr !== null) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    if (this._isDateShowing) {
+      const dateElement = this.getElement().querySelector(`.card__date`);
+      this._flatpickr = flatpickr(dateElement, {
+        altInput: true,
+        altFormat: `j F H:i`,
+        dateFormat: `j F H:i`,
+        defaultDate: this._card.dueDate || `today`,
+        enableTime: true,
+        time_24hr: true, // eslint-disable-line
+      });
+    }
   }
 
   _subscribeOnEvents() {

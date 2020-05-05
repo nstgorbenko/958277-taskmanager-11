@@ -1,6 +1,5 @@
 import AbstractComponent from "./abstract-component.js";
-import {formatTime} from "../utils/common.js";
-import {MONTH_NAMES} from "../const.js";
+import {formatDate, formatTime} from "../utils/common.js";
 
 const createButtonMarkup = (name, isActive = true) => {
   return (
@@ -17,7 +16,7 @@ const createCardTemplate = (card) => {
   const isDateShowing = !!dueDate;
   const isRepeatingCard = Object.values(repeatingDays).some(Boolean);
 
-  const date = isDateShowing ? `${dueDate.getDate()} ${MONTH_NAMES[dueDate.getMonth()]}` : ``;
+  const date = isDateShowing ? formatDate(dueDate) : ``;
   const time = isDateShowing ? formatTime(dueDate) : ``;
 
   const repeatClass = isRepeatingCard ? `card--repeat` : ``;
