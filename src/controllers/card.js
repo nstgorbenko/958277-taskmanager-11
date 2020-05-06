@@ -34,7 +34,6 @@ export default class CardController {
 
     this._cardEditComponent.setSubmitHandler(() => {
       this._replaceEditToCard();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
 
     this._cardComponent.setArchiveButtonClickHandler(() => {
@@ -77,6 +76,7 @@ export default class CardController {
   }
 
   _replaceEditToCard() {
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
     this._cardEditComponent.reset();
     replace(this._cardComponent, this._cardEditComponent);
     this._mode = Mode.DEFAULT;
