@@ -25,3 +25,6 @@ export const isRepeating = (repeatingDays) => {
   return Object.values(repeatingDays).some(Boolean);
 };
 
+export const setEndDate = (date) => {
+  return new Date(date).setHours(23, 59, 59);
+};

@@ -14,6 +14,10 @@ export default class Cards {
     return getCardsByFilter(this._cards, this._activeFilterType);
   }
 
+  getStatsCards() {
+    return getCardsByFilter(this._cards, FilterType.ARCHIVE);
+  }
+
   getCardsAll() {
     return this._cards;
   }
