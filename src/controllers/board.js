@@ -88,6 +88,19 @@ export default class BoardController {
     this._creatingCard.render(EmptyCard, CardControllerMode.ADDING);
   }
 
+  hide() {
+    this._container.hide();
+  }
+
+  show() {
+    this._container.show();
+  }
+
+  resetToDefault() {
+    this._sortComponent.setDefaultSortType();
+    this._onSortTypeChange(SortType.DEFAULT);
+  }
+
   _removeCards() {
     this._showedCardControllers.forEach((cardController) => cardController.destroy());
     this._showedCardControllers = [];
