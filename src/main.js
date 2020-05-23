@@ -1,34 +1,16 @@
+import API from "./api.js";
 import BoardComponent from "./components/board.js";
 import BoardController from "./controllers/board.js";
 import CardsModel from "./models/cards.js";
 import FilterController from "./controllers/filter.js";
 import MenuComponent from "./components/menu.js";
 import StatisticsComponent from "./components/statistics.js";
-import {generateCards} from "./mock/card.js";
 import {MenuItem} from "./const.js";
 import {render} from "./utils/render.js";
 import {setEndDate} from "./utils/common.js";
 
-const CARD_COUNT = 22;
-const cards = generateCards(CARD_COUNT);
-
-const siteMainElement = document.querySelector(`.main`);
-const siteHeaderElement = siteMainElement.querySelector(`.main__control`);
-
-const menuComponent = new MenuComponent();
-render(siteHeaderElement, menuComponent);
-
-const cardsModel = new CardsModel();
-cardsModel.setCards(cards);
-
-const filterController = new FilterController(siteMainElement, cardsModel);
-filterController.render();
-
-const boardComponent = new BoardComponent();
-render(siteMainElement, boardComponent);
-
-const boardController = new BoardController(boardComponent, cardsModel);
-boardController.render();
+const AUTHORIZATION = `Basic jzkskbfjkse6788gisnfkj=`;
+const END_POINT = `https://11.ecmascript.pages.academy/task-manager`;
 
 const dateTo = (() => {
   const date = new Date();
@@ -42,9 +24,25 @@ const dateFrom = (() => {
   return date;
 })();
 
+const api = new API(END_POINT, AUTHORIZATION);
+
+const cardsModel = new CardsModel();
+
+const siteMainElement = document.querySelector(`.main`);
+const siteHeaderElement = siteMainElement.querySelector(`.main__control`);
+
+const menuComponent = new MenuComponent();
 const statisticsComponent = new StatisticsComponent({cards: cardsModel, dateFrom, dateTo});
+const boardComponent = new BoardComponent();
+const boardController = new BoardController(boardComponent, cardsModel, api);
+const filterController = new FilterController(siteMainElement, cardsModel);
+
+render(siteHeaderElement, menuComponent);
+filterController.render();
+render(siteMainElement, boardComponent);
 render(siteMainElement, statisticsComponent);
 statisticsComponent.hide();
+boardController.showLoadingMessage();
 
 menuComponent.setOnChange((menuItem) => {
   switch (menuItem) {
@@ -67,3 +65,13 @@ menuComponent.setOnChange((menuItem) => {
       break;
   }
 });
+
+api.getCards()
+  .then((cards) => {
+    cardsModel.setCards(cards);
+    boardController.render();
+  })
+  .catch((err) => {
+    boardController.showNoCardsMessage();
+    throw err;
+  });
