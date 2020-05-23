@@ -27,8 +27,6 @@ export const EmptyCard = {
   isArchive: false,
 };
 
-export const FILTER_NAMES = [`all`, `overdue`, `today`, `favorites`, `repeating`, `archive`];
-
 export const FilterType = {
   ALL: `all`,
   OVERDUE: `overdue`,
@@ -42,6 +40,11 @@ export const MenuItem = {
   NEW_CARD: `control__new-task`,
   STATISTICS: `control__statistic`,
   CARDS: `control__task`,
+};
+
+export const Message = {
+  NO_CARDS: `Click «ADD NEW TASK» in menu to create your first task`,
+  LOADING: `Loading...`
 };
 
 export const Mode = {

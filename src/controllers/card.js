@@ -1,8 +1,29 @@
 import CardComponent from "../components/card.js";
 import CardEditComponent from "../components/card-edit.js";
-import {EmptyCard, Mode} from "../const.js";
+import CardModel from "../models/card.js";
+import {EmptyCard, DAYS, Mode} from "../const.js";
 import {isEscEvent} from "../utils/common.js";
 import {render, RenderPosition, replace, remove} from "../utils/render.js";
+
+const parseFormData = (formData) => {
+  const date = formData.get(`date`);
+  const repeatingDays = DAYS.reduce((acc, day) => {
+    acc[day] = false;
+    return acc;
+  }, {});
+
+  return new CardModel({
+    "description": formData.get(`text`),
+    "due_date": date ? new Date(date) : null,
+    "repeating_days": formData.getAll(`repeat`).reduce((acc, it) => {
+      acc[it] = true;
+      return acc;
+    }, repeatingDays),
+    "color": formData.get(`color`),
+    "is_favorite": false,
+    "is_done": false,
+  });
+};
 
 export default class CardController {
   constructor(container, onDataChange, onViewChange) {
@@ -30,19 +51,23 @@ export default class CardController {
     });
 
     this._cardComponent.setArchiveButtonClickHandler(() => {
-      this._onDataChange(this, card, Object.assign({}, card, {
-        isArchive: !card.isArchive,
-      }));
+      const newCard = CardModel.clone(card);
+      newCard.isArchive = !newCard.isArchive;
+
+      this._onDataChange(this, card, newCard);
     });
 
     this._cardComponent.setFavoritesButtonClickHandler(() => {
-      this._onDataChange(this, card, Object.assign({}, card, {
-        isFavorite: !card.isFavorite,
-      }));
+      const newCard = CardModel.clone(card);
+      newCard.isFavorite = !newCard.isFavorite;
+
+      this._onDataChange(this, card, newCard);
     });
 
-    this._cardEditComponent.setSubmitHandler(() => {
-      const data = this._cardEditComponent.getData();
+    this._cardEditComponent.setSubmitHandler((evt) => {
+      evt.preventDefault();
+      const formData = this._cardEditComponent.getData();
+      const data = parseFormData(formData);
       this._onDataChange(this, card, data);
     });
 

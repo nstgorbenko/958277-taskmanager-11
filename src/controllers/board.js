@@ -4,7 +4,7 @@ import LoadMoreButtonComponent from "../components/load-more-button.js";
 import NoCardsComponent from "../components/no-cards.js";
 import SortComponent from "../components/sort.js";
 import {remove, render} from "../utils/render.js";
-import {EmptyCard, Mode as CardControllerMode, SortType} from "../const.js";
+import {EmptyCard, Message, Mode as CardControllerMode, SortType} from "../const.js";
 
 const SHOWING_CARDS_COUNT_ON_START = 8;
 const SHOWING_CARDS_COUNT_BY_BUTTON = 8;
@@ -38,15 +38,16 @@ const getSortedCards = (cards, sortType, from, to) => {
 };
 
 export default class BoardController {
-  constructor(container, cardsModel) {
+  constructor(container, cardsModel, api) {
     this._container = container;
     this._cardsModel = cardsModel;
+    this._api = api;
 
     this._showedCardControllers = [];
     this._showingCardsCount = SHOWING_CARDS_COUNT_ON_START;
     this._creatingCard = null;
 
-    this._noCardsComponent = new NoCardsComponent();
+    this._noCardsComponent = null;
     this._sortComponent = new SortComponent();
     this._cardsComponent = new CardsComponent();
     this._loadMoreButtonComponent = new LoadMoreButtonComponent();
@@ -67,15 +68,28 @@ export default class BoardController {
     const cardsToShow = cards.filter((it) => !it.isArchive);
 
     if (cardsToShow.length === 0) {
+      this._noCardsComponent = new NoCardsComponent(Message.NO_CARDS);
       render(container, this._noCardsComponent);
       return;
     }
 
     render(container, this._sortComponent);
     render(container, this._cardsComponent);
+    remove(this._noCardsComponent);
 
     this._renderCards(cards.slice(0, this._showingCardsCount));
     this._renderLoadMoreButton();
+  }
+
+  showLoadingMessage() {
+    this._noCardsComponent = new NoCardsComponent(Message.LOADING);
+    render(this._container.getElement(), this._noCardsComponent);
+  }
+
+  showNoCardsMessage() {
+    remove(this._noCardsComponent);
+    this._noCardsComponent = new NoCardsComponent(Message.NO_CARDS);
+    render(this._container.getElement(), this._noCardsComponent);
   }
 
   createCard() {
@@ -156,11 +170,15 @@ export default class BoardController {
       this._cardsModel.removeCard(oldData.id);
       this._updateCards(this._showingCardsCount);
     } else {
-      const isSuccess = this._cardsModel.updateCard(oldData.id, newData);
+      this._api.updateCard(oldData.id, newData)
+        .then((cardModel) => {
+          const isSuccess = this._cardsModel.updateCard(oldData.id, cardModel);
 
-      if (isSuccess) {
-        cardController.render(newData, CardControllerMode.DEFAULT);
-      }
+          if (isSuccess) {
+            cardController.render(cardModel, CardControllerMode.DEFAULT);
+            this._updateCards(this._showingCardsCount);
+          }
+        });
     }
   }
 
