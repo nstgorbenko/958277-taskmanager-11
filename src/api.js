@@ -27,6 +27,17 @@ export default class API {
       .then(Card.parseCards);
   }
 
+  createCard(card) {
+    return this._load({
+      url: `tasks`,
+      method: Method.POST,
+      body: JSON.stringify(card.toRAW()),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then((response) => response.json())
+      .then(Card.parseCard);
+  }
+
   updateCard(id, data) {
     return this._load({
       url: `tasks/${id}`,
@@ -36,6 +47,10 @@ export default class API {
     })
       .then((response) => response.json())
       .then(Card.parseCard);
+  }
+
+  deleteCard(id) {
+    return this._load({url: `tasks/${id}`, method: Method.DELETE});
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
