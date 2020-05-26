@@ -8,6 +8,11 @@ import "flatpickr/dist/flatpickr.min.css";
 const MIN_DESCRIPTION_LENGTH = 1;
 const MAX_DESCRIPTION_LENGTH = 140;
 
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtonText: `Save`,
+};
+
 const isAllowableDescriptionLength = (description) => {
   const length = description.length;
 
@@ -56,7 +61,7 @@ const createRepeatingDaysMarkup = (days, repeatingDays) => {
 };
 
 const createCardEditTemplate = (options = {}) => {
-  const {color, currentDescription, dueDate, isDateShowing, isRepeatingCard, activeRepeatingDays} = options;
+  const {color, currentDescription, dueDate, isDateShowing, isRepeatingCard, activeRepeatingDays, externalData} = options;
 
   const description = encode(currentDescription);
 
@@ -73,6 +78,9 @@ const createCardEditTemplate = (options = {}) => {
 
   const colorsMarkup = createColorsMarkup(COLORS, color);
   const repeatingDaysMarkup = createRepeatingDaysMarkup(DAYS, activeRepeatingDays);
+
+  const deleteButtonText = externalData.deleteButtonText;
+  const saveButtonText = externalData.saveButtonText;
 
   return (
     `<article class="card card--edit card--${color} ${repeatClass} ${deadlineClass}">
@@ -136,8 +144,8 @@ const createCardEditTemplate = (options = {}) => {
           </div>
 
           <div class="card__status-btns">
-            <button class="card__save" type="submit" ${isBlockSaveButton ? `disabled` : ``}>save</button>
-            <button class="card__delete" type="button">delete</button>
+            <button class="card__save" type="submit" ${isBlockSaveButton ? `disabled` : ``}>${saveButtonText}</button>
+            <button class="card__delete" type="button">${deleteButtonText}</button>
           </div>
         </div>
       </form>
@@ -157,6 +165,7 @@ export default class CardEdit extends AbstractSmartComponent {
     this._isDateShowing = !!card.dueDate;
     this._isRepeatingCard = Object.values(card.repeatingDays).some(Boolean);
     this._activeRepeatingDays = Object.assign({}, card.repeatingDays);
+    this._externalData = DefaultData;
 
     this._flatpickr = null;
     this._submitHandler = null;
@@ -174,13 +183,18 @@ export default class CardEdit extends AbstractSmartComponent {
       isDateShowing: this._isDateShowing,
       isRepeatingCard: this._isRepeatingCard,
       activeRepeatingDays: this._activeRepeatingDays,
+      externalData: this._externalData,
     });
   }
 
   getData() {
     const form = this.getElement().querySelector(`.card__form`);
-
     return new FormData(form);
+  }
+
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.rerender();
   }
 
   setSubmitHandler(handler) {
@@ -192,7 +206,6 @@ export default class CardEdit extends AbstractSmartComponent {
   setDeleteButtonClickHandler(handler) {
     this.getElement().querySelector(`.card__delete`)
       .addEventListener(`click`, handler);
-
     this._deleteButtonClickHandler = handler;
   }
 

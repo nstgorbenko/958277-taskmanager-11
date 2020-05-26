@@ -5,6 +5,8 @@ import {EmptyCard, DAYS, Mode} from "../const.js";
 import {isEscEvent} from "../utils/common.js";
 import {render, RenderPosition, replace, remove} from "../utils/render.js";
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 const parseFormData = (formData) => {
   const date = formData.get(`date`);
   const repeatingDays = DAYS.reduce((acc, day) => {
@@ -68,10 +70,21 @@ export default class CardController {
       evt.preventDefault();
       const formData = this._cardEditComponent.getData();
       const data = parseFormData(formData);
+
+      this._cardEditComponent.setData({
+        saveButtonText: `Saving...`,
+      });
+
       this._onDataChange(this, card, data);
     });
 
-    this._cardEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, card, null));
+    this._cardEditComponent.setDeleteButtonClickHandler(() => {
+      this._cardEditComponent.setData({
+        deleteButtonText: `Deleting...`,
+      });
+
+      this._onDataChange(this, card, null);
+    });
 
     switch (mode) {
       case Mode.DEFAULT:
@@ -101,6 +114,21 @@ export default class CardController {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEditToCard();
     }
+  }
+
+  shake() {
+    this._cardEditComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._cardComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._cardEditComponent.getElement().style.animation = ``;
+      this._cardComponent.getElement().style.animation = ``;
+    }, SHAKE_ANIMATION_TIMEOUT);
+
+    this._cardEditComponent.setData({
+      saveButtonText: `Save`,
+      deleteButtonText: `Delete`,
+    });
   }
 
   destroy() {
