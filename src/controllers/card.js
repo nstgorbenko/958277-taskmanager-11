@@ -123,12 +123,12 @@ export default class CardController {
     setTimeout(() => {
       this._cardEditComponent.getElement().style.animation = ``;
       this._cardComponent.getElement().style.animation = ``;
-    }, SHAKE_ANIMATION_TIMEOUT);
 
-    this._cardEditComponent.setData({
-      saveButtonText: `Save`,
-      deleteButtonText: `Delete`,
-    });
+      this._cardEditComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   destroy() {

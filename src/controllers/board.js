@@ -188,7 +188,7 @@ export default class BoardController {
 
           if (isSuccess) {
             cardController.render(cardModel, CardControllerMode.DEFAULT);
-            // this._updateCards(this._showingCardsCount);
+            this._updateCards(this._showingCardsCount);
           }
         })
         .catch(() => {

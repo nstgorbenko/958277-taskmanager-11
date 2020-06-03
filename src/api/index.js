@@ -1,4 +1,4 @@
-import Card from "./models/card.js";
+import Card from "../models/card.js";
 
 const Method = {
   GET: `GET`,
@@ -51,6 +51,16 @@ export default class API {
 
   deleteCard(id) {
     return this._load({url: `tasks/${id}`, method: Method.DELETE});
+  }
+
+  sync(cards) {
+    return this._load({
+      url: `tasks/sync`,
+      method: Method.POST,
+      body: JSON.stringify(cards),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then((response) => response.json());
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
